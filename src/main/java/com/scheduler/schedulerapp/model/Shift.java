@@ -1,6 +1,8 @@
 package com.scheduler.schedulerapp.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalTime;
 
@@ -11,9 +13,13 @@ public class Shift {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+    @NotNull(message = "Shift name is required")
+    @Size(min = 3, max = 50, message = "Shift name must be between 3 and 50 characters")
     @Column(nullable = false)
     private String name; // Example: Morning, Evening, Night
 
+    @NotNull(message = "Start time is required")
     @Column(nullable = false)
     private LocalTime startTime;
 
