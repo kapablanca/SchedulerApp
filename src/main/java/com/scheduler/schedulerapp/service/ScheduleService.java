@@ -16,7 +16,6 @@ public class ScheduleService {
         this.scheduleRepository = scheduleRepository;
     }
 
-
     public List<Schedule> getAllSchedules() {
         return scheduleRepository.findAll();
     }
