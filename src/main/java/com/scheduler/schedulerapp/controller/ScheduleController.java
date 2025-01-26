@@ -40,14 +40,14 @@ public class ScheduleController {
 
     @PostMapping
     public ResponseEntity<Schedule> createSchedule(@RequestBody Schedule schedule) {
-        Schedule saveSchedule = scheduleService.saveSchedule(schedule);
-        return ResponseEntity.status(HttpStatus.CREATED).body(saveSchedule);
+        Schedule savedSchedule = scheduleService.saveSchedule(schedule);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedSchedule);
     }
 
     @PutMapping
     public ResponseEntity<Schedule> updateSchedule(@PathVariable long id, @RequestBody Schedule schedule) {
-        Schedule savedSchedule = scheduleService.updateSchedule(id, schedule);
-        return ResponseEntity.ok(savedSchedule);
+        Schedule updatedSchedule = scheduleService.updateSchedule(id, schedule);
+        return ResponseEntity.ok(updatedSchedule);
     }
 
     @DeleteMapping("/{id}")

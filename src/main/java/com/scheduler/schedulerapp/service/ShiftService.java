@@ -65,11 +65,10 @@ public class ShiftService {
         return shiftRepository.findByName(name);
     }
 
-    public void deleteShift(Long id) {
+    public void deleteShiftById(Long id) {
         if (!shiftRepository.existsById(id)) {
             throw new RuntimeException("Shift not found with id: " + id);
         }
-
         shiftRepository.deleteById(id);
     }
 
