@@ -31,12 +31,12 @@ public class PersonService {
         return personRepository.save(person);
     }
 
-    public Person updatePerson(Long id,Person updatedperson) {
+    public Person updatePerson(Long id, Person updatedPerson) {
         Person existingPerson = personRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Person not found"));
 
-        existingPerson.setFirstName(updatedperson.getFirstName().toUpperCase());
-        existingPerson.setLastName(updatedperson.getLastName().toUpperCase());
+        existingPerson.setFirstName(updatedPerson.getFirstName().toUpperCase());
+        existingPerson.setLastName(updatedPerson.getLastName().toUpperCase());
 
         return personRepository.save(existingPerson);
     }

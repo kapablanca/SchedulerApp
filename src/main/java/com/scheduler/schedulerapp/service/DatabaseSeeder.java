@@ -42,6 +42,14 @@ public class DatabaseSeeder implements CommandLineRunner {
             userRepository.save(adminUser);
             System.out.println("Admin user created with username: admin and password: admin123");
         }
+
+        // Ensure a test user exists
+        if (userRepository.findByUsername("testuser").isEmpty()) {
+            User testUser = new User("testuser", passwordEncoder.encode("test123"));
+            testUser.setRoles(Set.of(userRole));
+            userRepository.save(testUser);
+            System.out.println("Test user created with username: testuser and password: test123");
+        }
     }
 }
 

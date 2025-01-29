@@ -2,15 +2,13 @@ package com.scheduler.schedulerapp.controller;
 
 import com.scheduler.schedulerapp.model.Shift;
 import com.scheduler.schedulerapp.service.ShiftService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@RestController
-@RequestMapping("/api/v1/shifts")
+@Controller
+@RequestMapping("/shifts")
 public class ShiftController {
 
     private final ShiftService shiftService;
@@ -21,31 +19,32 @@ public class ShiftController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public ResponseEntity<List<Shift>> getAllShifts() {
-        List<Shift> shifts = shiftService.getAllShifts();
-        return ResponseEntity.ok(shifts);
+    public String getAllShifts(Model model) {
+        model.addAttribute("shifts", shiftService.getAllShifts());
+        return "shifts"; // The name of the Thymeleaf template
     }
 
-    @PostMapping
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Shift> createShift(@RequestBody Shift shift) {
-        Shift savedShift = shiftService.saveShift(shift);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedShift);
+    @PostMapping("/save")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String saveShift(@ModelAttribute Shift shift, Model model) {
+        try {
+            if (shift.getId() != null) {
+                shiftService.updateShift(shift.getId(), shift);
+            } else {
+                shiftService.saveShift(shift);
+            }
+            return "redirect:/shifts";
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("shift", shift);
+            model.addAttribute("errorMessage", e.getMessage());
+            return "shifts"; // Return to the form with an error message
+        }
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Shift> updateShift(@PathVariable Long id, @RequestBody Shift shift) {
-        Shift updatedShift = shiftService.updateShift(id, shift);
-        return ResponseEntity.ok(updatedShift);
-    }
-
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<Void> deleteShiftById(@PathVariable Long id) {
+    @GetMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public String deleteShift(@PathVariable Long id) {
         shiftService.deleteShiftById(id);
-        return ResponseEntity.noContent().build();
+        return "redirect:/shifts";
     }
-
-
 }
