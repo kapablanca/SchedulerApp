@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,9 +24,11 @@ public class SecurityConfig {
                         .requestMatchers("/user/**").hasAuthority("ROLE_USER")   // Only users can access /user/*
                         .anyRequest().authenticated()                           // All other requests require authentication
                 )
-                .formLogin(form -> form.permitAll()); // Enable form-based login
+                .formLogin(form -> form.permitAll())  // Enable form-based login for browsers
+                .httpBasic(Customizer.withDefaults()); // Correct and non-deprecated method to enable Basic Auth
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
