@@ -8,6 +8,7 @@
 <body>
 <h1>Manage People</h1>
 
+<!-- Table displaying people -->
 <table>
   <tr>
     <th>ID</th>
@@ -47,6 +48,7 @@
 <a th:href="@{/}">Back to Home</a>
 
 <script>
+  // Show the form for adding or editing a person
   function showForm(personId) {
     const formSection = document.getElementById('form-section');
     const formTitle = document.getElementById('form-title');
@@ -71,6 +73,7 @@
                 firstNameInput.value = person.firstName;
                 lastNameInput.value = person.lastName;
                 personIdInput.value = person.id;
+
                 formSection.style.display = 'block';
               })
               .catch(error => {
@@ -88,12 +91,15 @@
     }
   }
 
+  // Show confirmation dialog before deleting a person
   function confirmDelete(personId) {
     if (confirm("Are you sure you want to delete this person?")) {
+      // Redirect to the delete endpoint if the user confirms
       window.location.href = `/people/delete/${personId}`;
     }
   }
 
+  // Show confirmation dialog before saving changes
   function confirmSave() {
     return confirm("Are you sure you want to save these changes?");
   }

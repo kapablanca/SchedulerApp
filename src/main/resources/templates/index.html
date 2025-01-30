@@ -2,51 +2,22 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Scheduler App</title>
+    <title>Scheduler App - Home</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
-    <link rel="stylesheet" th:href="@{/home.css}">
 </head>
 <body>
 <h1>Welcome to the Scheduler App</h1>
-<p>This is the homepage of the scheduling system.</p>
 
-<!-- Tabs Section -->
-<div class="tabs">
-    <div class="tab active-tab" onclick="showTab('people-tab')">Manage People</div>
-    <div class="tab" onclick="showTab('shifts-tab')">Manage Shifts</div>
-    <div class="tab" onclick="showTab('users-tab')">Manage Users</div>
+<!-- Guard against null authentication to prevent errors -->
+<div th:if="${#authentication != null}">
+    <p>Hello, <span th:text="${#authentication.name}">User</span>!</p>
 </div>
 
-<!-- Tab Contents -->
-<div id="people-tab" class="tab-content visible">
-    <p>View and manage all registered people in the system.</p>
-    <a th:href="@{/people}">Go to People Management</a>
-</div>
-
-<div id="shifts-tab" class="tab-content">
-    <p>View and manage all available shifts.</p>
-    <a th:href="@{/shifts}">Go to Shifts Management</a>
-</div>
-
-<div id="users-tab" class="tab-content">
-    <p>View and manage system users (admins and regular users).</p>
-    <a th:href="@{/users}">Go to User Management</a>
-</div>
-
-<script>
-    function showTab(tabId) {
-        // Hide all tab contents
-        const tabContents = document.querySelectorAll('.tab-content');
-        tabContents.forEach(content => content.classList.remove('visible'));
-
-        // Remove active-tab class from all tabs
-        const tabs = document.querySelectorAll('.tab');
-        tabs.forEach(tab => tab.classList.remove('active-tab'));
-
-        // Show the selected tab content and activate the corresponding tab
-        document.getElementById(tabId).classList.add('visible');
-        event.currentTarget.classList.add('active-tab');
-    }
-</script>
+<ul>
+    <li><a th:href="@{/people}">Manage People</a></li>
+    <li><a th:href="@{/shifts}">Manage Shifts</a></li>
+    <li><a th:href="@{/users}">Manage Users</a></li>
+    <li><a th:href="@{/logout}">Logout</a></li>
+</ul>
 </body>
 </html>

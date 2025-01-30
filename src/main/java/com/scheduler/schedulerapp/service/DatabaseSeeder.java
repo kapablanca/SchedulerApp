@@ -25,31 +25,25 @@ public class DatabaseSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) {
         // Ensure roles exist
-        Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseGet(() -> {
-            Role role = new Role("ROLE_ADMIN");
-            return roleRepository.save(role);
-        });
+        Role adminRole = roleRepository.findByName("ROLE_ADMIN").orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
+        Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() -> roleRepository.save(new Role("ROLE_USER")));
 
-        Role userRole = roleRepository.findByName("ROLE_USER").orElseGet(() -> {
-            Role role = new Role("ROLE_USER");
-            return roleRepository.save(role);
-        });
-
-        // Ensure an admin user exists
+        // Ensure admin user exists
         if (userRepository.findByUsername("admin").isEmpty()) {
             User adminUser = new User("admin", passwordEncoder.encode("admin123"));
             adminUser.setRoles(Set.of(adminRole));
             userRepository.save(adminUser);
-            System.out.println("Admin user created with username: admin and password: admin123");
         }
 
-        // Ensure a test user exists
+        // Ensure test user exists
         if (userRepository.findByUsername("testuser").isEmpty()) {
             User testUser = new User("testuser", passwordEncoder.encode("test123"));
             testUser.setRoles(Set.of(userRole));
             userRepository.save(testUser);
-            System.out.println("Test user created with username: testuser and password: test123");
+            System.out.println("Test user created: testuser/test123");
         }
     }
 }
+
+
 

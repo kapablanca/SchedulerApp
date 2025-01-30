@@ -1,5 +1,6 @@
-package com.scheduler.schedulerapp.config; // Replace with your actual package
+package com.scheduler.schedulerapp.config;
 
+import com.scheduler.schedulerapp.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,14 +19,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
+                .csrf(csrf -> csrf.disable())  // Disable CSRF (for simplicity)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN") // Only admins can access /admin/*
-                        .requestMatchers("/user/**").hasAuthority("ROLE_USER")   // Only users can access /user/*
-                        .anyRequest().authenticated()                           // All other requests require authentication
+                        .requestMatchers("/login", "/error", "/styles.css", "/webjars/**").permitAll()
+                        .requestMatchers("/", "/people", "/shifts").hasAnyRole("USER", "ADMIN")  // Allow ROLE_USER to view
+                        .requestMatchers("/people/**", "/shifts/**", "/users/**").hasRole("ADMIN")  // Only ADMIN can add/edit/delete
+                        .anyRequest().authenticated()
                 )
-                .formLogin(form -> form.permitAll())  // Enable form-based login for browsers
-                .httpBasic(Customizer.withDefaults()); // Correct and non-deprecated method to enable Basic Auth
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                )
+                .httpBasic(Customizer.withDefaults());
         return http.build();
     }
 
@@ -35,13 +47,21 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
     @Bean
-    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public DaoAuthenticationProvider authenticationProvider(CustomUserDetailsService customUserDetailsService, PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setUserDetailsService(customUserDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder);
-        return new ProviderManager(authProvider);
+        return authProvider;
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager(DaoAuthenticationProvider authenticationProvider) {
+        return new ProviderManager(authenticationProvider);
+    }
 }
+
+
+
 
