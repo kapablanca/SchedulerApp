@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Monthly Schedule</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+
+<h1>Schedule for <span th:text="${currentMonth} + '/' + ${currentYear}"></span></h1>
+
+<!-- Navigation -->
+<div class="nav-buttons">
+    <form method="get" action="/schedule">
+        <input type="hidden" name="year" th:value="${currentYear}" />
+        <input type="hidden" name="month" th:value="${currentMonth - 1}" />
+        <button th:if="${currentMonth > 1}" type="submit">Previous Month</button>
+    </form>
+
+    <form method="get" action="/schedule">
+        <input type="hidden" name="year" th:value="${currentYear}" />
+        <input type="hidden" name="month" th:value="${currentMonth + 1}" />
+        <button th:if="${currentMonth < 12}" type="submit">Next Month</button>
+    </form>
+</div>
+
+<!-- Calendar Table -->
+<table>
+    <thead>
+    <tr>
+        <th>Day</th>
+        <th>Schedules</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="day : ${#numbers.sequence(1, daysInMonth)}">
+        <td th:text="${day}"></td>
+        <td>
+            <ul>
+                <li th:each="schedule : ${schedules}"
+                    th:if="${schedule.date.dayOfMonth == day}">
+                    <span th:text="'Shift: ' + ${schedule.shift.name} + ', Person: ' + ${schedule.person.firstName} + ' ' + ${schedule.person.lastName}"></span>
+                </li>
+            </ul>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<a th:href="@{/}">Back to Home</a>
+
+</body>
+</html>
