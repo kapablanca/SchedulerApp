@@ -1,53 +1,62 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
-    <title>Monthly Schedule</title>
+    <title>Schedule - Scheduler App</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
+    <!-- Optionally, include home.css if needed for additional page-specific styling -->
+    <link rel="stylesheet" th:href="@{/home.css}">
 </head>
 <body>
+<h1>Schedule for <span th:text="${currentMonth}"></span> <span th:text="${currentYear}"></span></h1>
 
-<h1>Schedule for <span th:text="${currentMonth} + '/' + ${currentYear}"></span></h1>
-
-<!-- Navigation -->
-<div class="nav-buttons">
-    <form method="get" action="/schedule">
-        <input type="hidden" name="year" th:value="${currentYear}" />
-        <input type="hidden" name="month" th:value="${currentMonth - 1}" />
-        <button th:if="${currentMonth > 1}" type="submit">Previous Month</button>
-    </form>
-
-    <form method="get" action="/schedule">
-        <input type="hidden" name="year" th:value="${currentYear}" />
-        <input type="hidden" name="month" th:value="${currentMonth + 1}" />
-        <button th:if="${currentMonth < 12}" type="submit">Next Month</button>
-    </form>
+<!-- Navigation for month -->
+<div class="month-nav" style="text-align: center; margin-bottom: 20px;">
+    <a th:href="@{/schedule(year=${previousYear}, month=${previousMonth})}" class="nav-button" style="width: auto; display: inline-block; padding: 5px 10px;">&lt; Previous</a>
+    <span style="font-size: 18px; margin: 0 15px;">
+            <span th:text="${currentMonth}"></span> <span th:text="${currentYear}"></span>
+        </span>
+    <a th:href="@{/schedule(year=${nextYear}, month=${nextMonth})}" class="nav-button" style="width: auto; display: inline-block; padding: 5px 10px;">Next &gt;</a>
 </div>
 
-<!-- Calendar Table -->
+<!-- Calendar table view -->
 <table>
     <thead>
     <tr>
-        <th>Day</th>
-        <th>Schedules</th>
+        <th style="width: 100px;">Day</th>
+        <!-- One header cell for each shift -->
+        <th th:each="shift : ${shiftList}" th:text="${shift.name}"></th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="day : ${#numbers.sequence(1, daysInMonth)}">
-        <td th:text="${day}"></td>
+    <tr th:each="day : ${days}">
+        <!-- First column: day name and day number -->
         <td>
-            <ul>
-                <li th:each="schedule : ${schedules}"
-                    th:if="${schedule.date.dayOfMonth == day}">
-                    <span th:text="'Shift: ' + ${schedule.shift.name} + ', Person: ' + ${schedule.person.firstName} + ' ' + ${schedule.person.lastName}"></span>
-                </li>
-            </ul>
+            <div><strong th:text="${day.dayName}"></strong></div>
+            <div th:text="${day.dayNumber}"></div>
+        </td>
+        <!-- One cell per shift -->
+        <td th:each="shift : ${shiftList}">
+            <div>
+                <!-- If there is an assignment, show the person; otherwise, show a placeholder -->
+                <span th:if="${day.assignments[shift.name] != null}"
+                      th:text="${day.assignments[shift.name]}">Assigned Person</span>
+                <span th:if="${day.assignments[shift.name] == null}">-</span>
+            </div>
+            <!-- Admin controls: show edit, delete or assign options -->
+            <div sec:authorize="hasRole('ADMIN')" style="margin-top: 5px;">
+                        <span th:if="${day.assignments[shift.name] != null}">
+                            <a th:href="@{'/schedule/edit/' + ${day.date} + '/' + ${shift.name}}">Edit</a> |
+                            <a th:href="@{'/schedule/delete/' + ${day.date} + '/' + ${shift.name}}">Delete</a>
+                        </span>
+                <span th:if="${day.assignments[shift.name] == null}">
+                            <a th:href="@{'/schedule/assign/' + ${day.date} + '/' + ${shift.name}}">Assign</a>
+                        </span>
+            </div>
         </td>
     </tr>
     </tbody>
 </table>
-
-<a th:href="@{/}">Back to Home</a>
-
 </body>
 </html>

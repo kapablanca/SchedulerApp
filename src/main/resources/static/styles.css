@@ -1,47 +1,84 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+/* Login page styles */
+body.login-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f2f2f2;
     margin: 0;
     padding: 0;
 }
 
-h1, h2 {
-    color: #333;
+.login-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 300px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
+.login-container h1 {
+    text-align: center;
+    margin-bottom: 1rem;
 }
 
-th, td {
-    padding: 10px;
+.login-container form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-container label {
+    margin-top: 1rem;
+}
+
+.login-container input {
+    padding: 0.5rem;
+    margin-top: 0.5rem;
     border: 1px solid #ccc;
-    text-align: left;
+    border-radius: 4px;
 }
 
-th {
-    background-color: #ddd;
-}
-
-a {
-    color: #0073e6;
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-button {
+.login-container button {
+    margin-top: 1.5rem;
+    padding: 0.7rem;
     background-color: #0073e6;
     color: white;
-    padding: 8px 12px;
     border: none;
+    border-radius: 4px;
     cursor: pointer;
 }
 
-button:hover {
+.login-container button:hover {
     background-color: #005bb5;
+}
+
+.login-container p {
+    text-align: center;
+}
+
+/* Navigation button styles (for index and other pages) */
+.nav-button {
+    display: block;
+    width: 200px;
+    padding: 10px;
+    margin: 10px auto;
+    background-color: #0073e6;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    border-radius: 5px;
+}
+
+.nav-button:hover {
+    background-color: #005bb5;
+}
+
+/* Optionally, override the logout button style if desired */
+.nav-button.logout {
+    background-color: #e74c3c;
+}
+
+.nav-button.logout:hover {
+    background-color: #c0392b;
 }

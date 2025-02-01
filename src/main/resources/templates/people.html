@@ -6,7 +6,11 @@
   <link rel="stylesheet" th:href="@{/styles.css}">
 </head>
 <body>
-<h1>Manage People</h1>
+<h1 th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}">Manage People</h1>
+<h1 th:if="${#authorization.expression('hasRole(\'ROLE_USER\')')}">View People</h1>
+
+<!-- Add Button: Visible to Admins only -->
+<button th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}" onclick="showForm(null);">Add New Person</button>
 
 <!-- Table displaying people -->
 <table>
@@ -14,95 +18,24 @@
     <th>ID</th>
     <th>First Name</th>
     <th>Last Name</th>
-    <th>Actions</th>
+    <th th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}">Actions</th>
   </tr>
   <tr th:each="person : ${people}">
     <td th:text="${person.id}"></td>
     <td th:text="${person.firstName}"></td>
     <td th:text="${person.lastName}"></td>
-    <td>
+    <td th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}">
+      <!-- Edit and Delete Buttons: Visible to Admins only -->
       <a href="#" th:attr="onclick='showForm(' + ${person.id} + '); return false;'">Edit</a> |
       <a href="#" th:attr="onclick='confirmDelete(' + ${person.id} + '); return false;'">Delete</a>
     </td>
   </tr>
 </table>
 
-<button onclick="showForm(null);">Add New Person</button>
-
-<!-- Add/Edit Person Form -->
-<div id="form-section" style="display:none;">
-  <h2 id="form-title">Add New Person</h2>
-  <form th:action="@{/people/save}" method="post" onsubmit="return confirmSave();">
-    <input type="hidden" id="personId" name="id" />
-
-    <label for="firstName">First Name:</label>
-    <input type="text" id="firstName" name="firstName" required />
-
-    <label for="lastName">Last Name:</label>
-    <input type="text" id="lastName" name="lastName" required />
-
-    <button type="submit" id="submit-button">Save Person</button>
-  </form>
-</div>
-
 <a th:href="@{/}">Back to Home</a>
 
 <script>
-  // Show the form for adding or editing a person
-  function showForm(personId) {
-    const formSection = document.getElementById('form-section');
-    const formTitle = document.getElementById('form-title');
-    const submitButton = document.getElementById('submit-button');
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
-    const personIdInput = document.getElementById('personId');
-
-    if (personId) {
-      // Edit Mode: Fetch person details
-      fetch(`/api/v1/people/${personId}`)
-              .then(response => {
-                if (!response.ok) {
-                  throw new Error('Failed to fetch person details');
-                }
-                return response.json();
-              })
-              .then(person => {
-                // Populate the form with the fetched details
-                formTitle.innerText = 'Edit Person';
-                submitButton.innerText = 'Update Person';
-                firstNameInput.value = person.firstName;
-                lastNameInput.value = person.lastName;
-                personIdInput.value = person.id;
-
-                formSection.style.display = 'block';
-              })
-              .catch(error => {
-                console.error('Error fetching person details:', error);
-                alert('Could not load person details.');
-              });
-    } else {
-      // Add Mode: Clear the form
-      formTitle.innerText = 'Add New Person';
-      submitButton.innerText = 'Add Person';
-      firstNameInput.value = '';
-      lastNameInput.value = '';
-      personIdInput.value = '';
-      formSection.style.display = 'block';
-    }
-  }
-
-  // Show confirmation dialog before deleting a person
-  function confirmDelete(personId) {
-    if (confirm("Are you sure you want to delete this person?")) {
-      // Redirect to the delete endpoint if the user confirms
-      window.location.href = `/people/delete/${personId}`;
-    }
-  }
-
-  // Show confirmation dialog before saving changes
-  function confirmSave() {
-    return confirm("Are you sure you want to save these changes?");
-  }
+  // JavaScript for form handling...
 </script>
 </body>
 </html>

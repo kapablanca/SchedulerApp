@@ -4,21 +4,39 @@
     <meta charset="UTF-8">
     <title>Login - Scheduler App</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
+    <style>
+        /* Additional styles if needed */
+    </style>
 </head>
-<body>
-<h1>Login to Scheduler App</h1>
+<body class="login-page">
+<div class="login-container">
+    <h1>Login</h1>
+    <form th:action="@{/login}" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
 
-<form th:action="@{/login}" method="post">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required>
+        <button type="submit">Login</button>
+    </form>
+    <!-- Logout message with an ID -->
+    <p th:if="${param.logout}" id="logoutMessage" style="color: green;">
+        You have been logged out successfully.
+    </p>
+    <p th:if="${param.error}" style="color: red;">Invalid username or password.</p>
+</div>
 
-    <button type="submit">Login</button>
-</form>
-
-<p th:if="${param.error}" style="color: red;">Invalid username or password.</p>
-<p th:if="${param.logout}" style="color: green;">You have been logged out successfully.</p>
+<!-- JavaScript to hide the logout message after 3 seconds -->
+<script>
+    window.addEventListener('load', function() {
+        var logoutMessage = document.getElementById('logoutMessage');
+        if(logoutMessage) {
+            setTimeout(function() {
+                logoutMessage.style.display = 'none';
+            }, 3000); // Hides the message after 5000 milliseconds (5 seconds)
+        }
+    });
+</script>
 </body>
 </html>
