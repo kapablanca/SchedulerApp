@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <title>Manage People</title>
   <link rel="stylesheet" th:href="@{/styles.css}">
 </head>
 <body>
-<h1 th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}">Manage People</h1>
-<h1 th:if="${#authorization.expression('hasRole(\'ROLE_USER\')')}">View People</h1>
+<!-- Heading for Admins -->
+<h1 sec:authorize="hasRole('ADMIN')">Manage People</h1>
 
-<!-- Add Button: Visible to Admins only -->
-<button th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}" onclick="showForm(null);">Add New Person</button>
+<!-- Heading for Users -->
+<h1 sec:authorize="hasRole('USER')">View People</h1>
+
 
 <!-- Table displaying people -->
 <table>
@@ -18,19 +20,36 @@
     <th>ID</th>
     <th>First Name</th>
     <th>Last Name</th>
-    <th th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}">Actions</th>
+    <th sec:authorize="hasRole('ADMIN')">Actions</th>
   </tr>
   <tr th:each="person : ${people}">
     <td th:text="${person.id}"></td>
     <td th:text="${person.firstName}"></td>
     <td th:text="${person.lastName}"></td>
-    <td th:if="${#authorization.expression('hasRole(\'ROLE_ADMIN\')')}">
-      <!-- Edit and Delete Buttons: Visible to Admins only -->
+    <td sec:authorize="hasRole('ADMIN')">
       <a href="#" th:attr="onclick='showForm(' + ${person.id} + '); return false;'">Edit</a> |
       <a href="#" th:attr="onclick='confirmDelete(' + ${person.id} + '); return false;'">Delete</a>
     </td>
   </tr>
 </table>
+
+<button onclick="showForm(null);" sec:authorize="hasRole('ADMIN')">Add New Person</button>
+
+<!-- Add/Edit Shift Form -->
+<div id="form-section" style="display:none;">
+  <h2 id="form-title">Add New Person</h2>
+  <form th:action="@{/people/save}" method="post" onsubmit="return confirmSave();">
+    <input type="hidden" id="personId" name="id" />
+
+    <label for="personFirstName">First Name:</label>
+    <input type="text" id="personFirstName" name="firstName" required />
+
+    <label for="personLastName">Last Name:</label>
+    <input type="text" id="personLastName" name="lastName" required />
+
+    <button type="submit" id="submit-button">Save Person</button>
+  </form>
+</div>
 
 <a th:href="@{/}">Back to Home</a>
 

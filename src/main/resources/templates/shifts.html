@@ -1,12 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <title>Manage Shifts</title>
   <link rel="stylesheet" th:href="@{/styles.css}">
 </head>
 <body>
-<h1>Manage Shifts</h1>
+<!-- Heading for Admins -->
+<h1 sec:authorize="hasRole('ADMIN')">Manage Shifts</h1>
+
+<!-- Heading for Users -->
+<h1 sec:authorize="hasRole('USER')">View Shifts</h1>
+
 
 <!-- Table displaying shifts -->
 <table>
@@ -15,21 +21,21 @@
     <th>Shift Name</th>
     <th>Start Time</th>
     <th>End Time</th>
-    <th>Actions</th>
+    <th sec:authorize="hasRole('ADMIN')">Actions</th>
   </tr>
   <tr th:each="shift : ${shifts}">
     <td th:text="${shift.id}"></td>
     <td th:text="${shift.name}"></td>
     <td th:text="${shift.startTime}"></td>
     <td th:text="${shift.endTime}"></td>
-    <td>
+    <td sec:authorize="hasRole('ADMIN')">
       <a href="#" th:attr="onclick='showForm(' + ${shift.id} + '); return false;'">Edit</a> |
       <a href="#" th:attr="onclick='confirmDelete(' + ${shift.id} + '); return false;'">Delete</a>
     </td>
   </tr>
 </table>
 
-<button onclick="showForm(null);">Add New Shift</button>
+<button onclick="showForm(null);" sec:authorize="hasRole('ADMIN')">Add New Shift</button>
 
 <!-- Add/Edit Shift Form -->
 <div id="form-section" style="display:none;">
