@@ -6,6 +6,9 @@
     <link rel="stylesheet" th:href="@{/styles.css}">
 </head>
 <body>
+
+<header th:replace="fragments/header :: header"></header>
+
 <h1>Manage Users</h1>
 
 <!-- Table displaying users -->
@@ -121,5 +124,7 @@
         return confirm("Are you sure you want to save these changes?");
     }
 </script>
+
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

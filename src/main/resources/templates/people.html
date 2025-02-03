@@ -7,6 +7,8 @@
   <link rel="stylesheet" th:href="@{/styles.css}">
 </head>
 <body>
+
+<header th:replace="fragments/header :: header"></header>
 <!-- Heading for Admins -->
 <h1 sec:authorize="hasRole('ADMIN')">Manage People</h1>
 
@@ -51,10 +53,65 @@
   </form>
 </div>
 
-<a th:href="@{/}">Back to Home</a>
-
 <script>
-  // JavaScript for form handling...
+  // Show the form for adding or editing a person
+  function showForm(personId) {
+    const formSection = document.getElementById('form-section');
+    const formTitle = document.getElementById('form-title');
+    const submitButton = document.getElementById('submit-button');
+    const firstNameInput = document.getElementById('personFirstName');
+    const lastNameInput = document.getElementById('personLastName');
+    const personIdInput = document.getElementById('personId');
+
+    if (personId) {
+      // Edit Mode: Fetch person details
+      fetch(`/api/v1/people/${personId}`)
+              .then(response => {
+                if (!response.ok) {
+                  throw new Error('Failed to fetch person details');
+                }
+                return response.json();
+              })
+              .then(person => {
+                // Populate the form with the fetched details
+                formTitle.innerText = 'Edit Person';
+                submitButton.innerText = 'Update Person';
+                firstNameInput.value = person.firstName;
+                lastNameInput.value = person.lastName;
+                personIdInput.value = person.id;
+
+                formSection.style.display = 'block';
+              })
+              .catch(error => {
+                console.error('Error fetching person details:', error);
+                alert('Could not load person details.');
+              });
+    } else {
+      // Add Mode: Clear the form
+      formTitle.innerText = 'Add New Person';
+      submitButton.innerText = 'Add Person';
+      firstNameInput.value = '';
+      lastNameInput.value = '';
+      personIdInput.value = '';
+      formSection.style.display = 'block';
+    }
+  }
+
+  // Show confirmation dialog before deleting a person
+  function confirmDelete(personId) {
+    if (confirm("Are you sure you want to delete this person?")) {
+      // Redirect to the delete endpoint if the user confirms
+      window.location.href = `/people/delete/${personId}`;
+    }
+  }
+
+  // Show confirmation dialog before saving changes
+  function confirmSave() {
+    return confirm("Are you sure you want to save these changes?");
+  }
 </script>
+
+<footer th:replace="fragments/footer :: footer"></footer>
+
 </body>
 </html>

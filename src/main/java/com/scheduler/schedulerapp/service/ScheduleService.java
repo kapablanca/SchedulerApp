@@ -9,15 +9,24 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ScheduleService {
 
     private final ScheduleRepository scheduleRepository;
+    private final PersonService personService;
+    private final ShiftService shiftService;
 
-    public ScheduleService(ScheduleRepository scheduleRepository) {
+    public ScheduleService(ScheduleRepository scheduleRepository,
+                           PersonService personService,
+                           ShiftService shiftService) {
         this.scheduleRepository = scheduleRepository;
+        this.personService = personService;
+        this.shiftService = shiftService;
     }
+
+
 
     public List<Schedule> getAllSchedules() {
         return scheduleRepository.findAll();
@@ -82,6 +91,42 @@ public class ScheduleService {
         }
 
         return scheduleRepository.saveAll(schedules);
+    }
+
+
+    public void updateAssignment(LocalDate date, Long shiftId, Long personId) {
+        // Retrieve schedules for the given date
+        List<Schedule> schedules = scheduleRepository.findByDate(date);
+
+        // Find the schedule corresponding to the given shiftId
+        Optional<Schedule> optionalSchedule = schedules.stream()
+                .filter(s -> s.getShift().getId().equals(shiftId))
+                .findFirst();
+
+        if (personId == null || personId == 0) {
+            // If no person is selected, remove the assignment if it exists.
+            if (optionalSchedule.isPresent()) {
+                scheduleRepository.delete(optionalSchedule.get());
+            }
+        } else {
+            // Otherwise, update or create the assignment.
+            // You will need a method in your PersonService to fetch the Person by id:
+            Person person = personService.getPersonById(personId);
+            if (optionalSchedule.isPresent()) {
+                Schedule schedule = optionalSchedule.get();
+                schedule.setPerson(person);
+                scheduleRepository.save(schedule);
+            } else {
+                // Optionally, create a new schedule if one doesn't exist for that shift on that day.
+                Schedule schedule = new Schedule();
+                schedule.setDate(date);
+                // You will also need a method in your ShiftService to fetch the shift by id:
+                Shift shift = shiftService.getShiftById(shiftId);
+                schedule.setShift(shift);
+                schedule.setPerson(person);
+                scheduleRepository.save(schedule);
+            }
+        }
     }
 
 }

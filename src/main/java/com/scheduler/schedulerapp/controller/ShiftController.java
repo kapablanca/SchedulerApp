@@ -28,16 +28,28 @@ public class ShiftController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public String saveShift(@ModelAttribute Shift shift, Model model) {
         try {
+            // Validate input fields
+            if (shift.getStartTime() == null || shift.getName() == null || shift.getName().isBlank()) {
+                model.addAttribute("shift", shift);
+                model.addAttribute("errorMessage", "Shift name and start time are required.");
+                return "shifts";  // Return to the form with validation error
+            }
+
+            // Automatically calculate end time
+            shift.setStartTime(shift.getStartTime());
+
+            // Save or update the shift
             if (shift.getId() != null) {
                 shiftService.updateShift(shift.getId(), shift);
             } else {
                 shiftService.saveShift(shift);
             }
-            return "redirect:/shifts";
+
+            return "redirect:/shifts";  // Redirect after successful save
         } catch (IllegalArgumentException e) {
             model.addAttribute("shift", shift);
             model.addAttribute("errorMessage", e.getMessage());
-            return "shifts"; // Return to the form with an error message
+            return "shifts";  // Return to the form with an error message
         }
     }
 

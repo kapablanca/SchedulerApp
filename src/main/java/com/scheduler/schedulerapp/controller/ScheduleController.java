@@ -1,5 +1,6 @@
 package com.scheduler.schedulerapp.controller;
 
+import com.scheduler.schedulerapp.dto.DaySchedule;
 import com.scheduler.schedulerapp.model.Person;
 import com.scheduler.schedulerapp.model.Schedule;
 import com.scheduler.schedulerapp.model.Shift;
@@ -15,7 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.time.Month;
+import java.time.YearMonth;
+import java.time.format.TextStyle;
+import java.util.*;
 
 @Controller
 @RequestMapping("/schedule")
@@ -31,39 +35,84 @@ public class ScheduleController {
         this.personService = personService;
     }
 
-    @GetMapping
+    @GetMapping("")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_USER')")
-    public String showMonthlySchedule(
-            @RequestParam(value = "year", required = false) Integer year,
-            @RequestParam(value = "month", required = false) Integer month,
-            Model model) {
+    public String getSchedule(@RequestParam(value = "year", required = false) Integer year,
+                              @RequestParam(value = "month", required = false) Integer month,
+                              Model model) {
+        // If not provided, use the current year and month
+        LocalDate now = LocalDate.now();
+        if (year == null) {
+            year = now.getYear();
+        }
+        if (month == null) {
+            month = now.getMonthValue();
+        }
 
-        LocalDate currentDate = (year == null || month == null)
-                ? LocalDate.now()
-                : LocalDate.of(year, month, 1);
+        // Calculate the month name (e.g., "February")
+        String monthName = Month.of(month).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
-        LocalDate firstDayOfMonth = currentDate.withDayOfMonth(1);
-        LocalDate lastDayOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth());
+        // Retrieve shifts and sort them by start time then alphabetically by name
+        List<Shift> shifts = shiftService.getAllShifts();
+        shifts.sort(Comparator.comparing(Shift::getStartTime).thenComparing(Shift::getName));
 
-        List<Schedule> monthlySchedules = scheduleService.getSchedulesByDateRange(firstDayOfMonth, lastDayOfMonth);
+        // Build the list of days for the month
+        YearMonth yearMonth = YearMonth.of(year, month);
+        int daysInMonth = yearMonth.lengthOfMonth();
+        List<DaySchedule> daySchedules = new ArrayList<>();
+        for (int d = 1; d <= daysInMonth; d++) {
+            LocalDate date = LocalDate.of(year, month, d);
+            // Get abbreviated day name (e.g., "Mon")
+            String dayName = date.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+            // Retrieve assignments for the date (assume it returns a Map with key = shift id, value = Person)
+            Map<Long, Person> assignments = getAssignmentsForDate(date);
+            DaySchedule ds = new DaySchedule(d, dayName, date.toString(), assignments);
+            daySchedules.add(ds);
+        }
 
-        model.addAttribute("schedules", monthlySchedules);
-        model.addAttribute("currentMonth", currentDate.getMonthValue());
-        model.addAttribute("currentYear", currentDate.getYear());
-        model.addAttribute("daysInMonth", currentDate.lengthOfMonth());
+        // Calculate previous and next month values for navigation
+        YearMonth currentYM = YearMonth.of(year, month);
+        YearMonth previousYM = currentYM.minusMonths(1);
+        YearMonth nextYM = currentYM.plusMonths(1);
+
+        model.addAttribute("currentYear", year);
+        model.addAttribute("currentMonth", month);
+        model.addAttribute("monthName", monthName);
+        model.addAttribute("days", daySchedules);
+        model.addAttribute("shiftList", shifts);
+        model.addAttribute("peopleList", personService.getAllPersons());
+
+        model.addAttribute("previousYear", previousYM.getYear());
+        model.addAttribute("previousMonth", previousYM.getMonthValue());
+        model.addAttribute("nextYear", nextYM.getYear());
+        model.addAttribute("nextMonth", nextYM.getMonthValue());
 
         return "schedule";
     }
 
-    @PostMapping("/generate")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public String generateSchedule(@RequestParam String monthStart, Model model) {
-        LocalDate startOfMonth = LocalDate.parse(monthStart);
-        List<Shift> shifts = shiftService.getAllShifts();
-        List<Person> people = personService.getAllPersons();
 
-        scheduleService.generateMonthlySchedule(startOfMonth, shifts, people);
-        model.addAttribute("message", "Schedule generated successfully for: " + startOfMonth);
-        return "redirect:/schedule?year=" + startOfMonth.getYear() + "&month=" + startOfMonth.getMonthValue();
+        // Endpoint to update a schedule assignment (only accessible to ADMIN)
+        @PostMapping("/update")
+        public String updateSchedule(@RequestParam("date") String dateStr,
+                @RequestParam("shiftId") Long shiftId,
+                @RequestParam(value = "personId", required = false) Long personId) {
+            LocalDate date = LocalDate.parse(dateStr);
+            // Update the assignment: if personId is null or empty, remove assignment; otherwise, assign that person
+            scheduleService.updateAssignment(date, shiftId, personId);
+            YearMonth ym = YearMonth.from(date);
+            return "redirect:/schedule?year=" + ym.getYear() + "&month=" + ym.getMonthValue();
+        }
+
+        private Map<Long, Person> getAssignmentsForDate(LocalDate date) {
+            List<Schedule> schedules = scheduleService.getSchedulesByDate(date);
+            Map<Long, Person> assignments = new HashMap<>();
+            for (Schedule schedule : schedules) {
+                // Assuming only one schedule per shift per date.
+                assignments.put(schedule.getShift().getId(), schedule.getPerson());
+            }
+            return assignments;
     }
-}
+
+
+
+    }

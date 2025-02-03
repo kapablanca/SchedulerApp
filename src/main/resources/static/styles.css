@@ -82,3 +82,137 @@ body.login-page {
 .nav-button.logout:hover {
     background-color: #c0392b;
 }
+
+/*Simple button styles*/
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    text-align: center;
+    color: white;
+    background-color: #0073e6;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.button:hover {
+    background-color: #005bb5;
+}
+
+/*Simple table styles*/
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+th {
+    background-color: #0073e6;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #d1e7ff;
+}
+
+
+/* Overall page layout */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+/* Header styles */
+.site-header {
+    background-color: #0073e6;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;  /* Allow wrapping on smaller screens */
+    box-sizing: border-box;
+}
+
+.site-header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.site-header nav {
+    display: flex;
+    gap: 10px;  /* Space between links */
+    flex-wrap: wrap;  /* Allow wrapping */
+}
+
+.nav-link {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    background-color: #0073e6;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.nav-link:hover {
+    background-color: #005bb5;
+}
+
+.nav-link.logout {
+    background-color: #e74c3c;
+}
+
+.nav-link.logout:hover {
+    background-color: #c0392b;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    .site-header {
+        flex-direction: column;  /* Stack the title and nav links */
+        align-items: flex-start;
+    }
+
+    .site-header nav {
+        width: 100%;  /* Ensure links don’t overflow horizontally */
+        justify-content: flex-start;
+    }
+
+    .nav-link {
+        padding: 8px 10px;
+        font-size: 14px;  /* Reduce font size on smaller screens */
+    }
+}
+
+
+/* Footer styles */
+.site-footer {
+    background-color: #0073e6;
+    color: white;
+    padding: 10px 20px;
+    position: relative;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.site-footer p {
+    margin: 0;
+}
+

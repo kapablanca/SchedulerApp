@@ -24,6 +24,9 @@
     <a th:href="@{/schedule}" class="nav-button">View Schedule</a>
 </div>
 
-<a th:href="@{/logout}" class="nav-button logout">Logout</a>
+<a th:href="@{/logout}" class="nav-button logout"
+   onclick="return confirm('Are you sure you want to log out?');">Logout</a>
+
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

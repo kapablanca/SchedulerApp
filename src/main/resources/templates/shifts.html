@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html   xmlns:th="http://www.thymeleaf.org"
+        xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8">
   <title>Manage Shifts</title>
   <link rel="stylesheet" th:href="@{/styles.css}">
 </head>
 <body>
+
+<header th:replace="fragments/header :: header"></header>
 <!-- Heading for Admins -->
 <h1 sec:authorize="hasRole('ADMIN')">Manage Shifts</h1>
 
@@ -47,16 +49,15 @@
     <input type="text" id="shiftName" name="name" required />
 
     <label for="startTime">Start Time (HH:MM):</label>
-    <input type="time" id="startTime" name="startTime" required />
+    <input type="time" id="startTime" name="startTime"  required />
 
     <label for="endTime">End Time:</label>
-    <input type="time" id="endTime" name="endTime" readonly />
+    <input type="time" id="endTime"  readonly />
 
     <button type="submit" id="submit-button">Save Shift</button>
   </form>
 </div>
 
-<a th:href="@{/}">Back to Home</a>
 
 <script>
   // Show the form for adding or editing a shift
@@ -105,16 +106,15 @@
     }
   }
 
-  // Automatically calculate end time (example: add 8 hours to start time)
   document.getElementById('startTime').addEventListener('change', function () {
     const startTime = this.value;
     if (startTime) {
       const [hours, minutes] = startTime.split(':').map(Number);
-      const endTime = new Date(0, 0, 0, hours + 8, minutes); // Adjust this to your desired shift length
-      const formattedEndTime = endTime.toTimeString().slice(0, 5);
-      document.getElementById('endTime').value = formattedEndTime;
+      const endTime = new Date(0, 0, 0, hours + 8, minutes);  // Adjust duration as needed
+      document.getElementById('endTime').value = endTime.toTimeString().slice(0, 5);
     }
   });
+
 
   // Show confirmation dialog before deleting a shift
   function confirmDelete(shiftId) {
@@ -129,5 +129,7 @@
     return confirm("Are you sure you want to save these changes?");
   }
 </script>
+
+<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

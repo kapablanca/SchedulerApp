@@ -1,0 +1,19 @@
+<header class="site-header">
+    <h1>Scheduler App</h1>
+    <nav>
+        <a th:href="@{/}" class="nav-link">Home</a>
+        <a th:href="@{/logout}" class="nav-link logout" style="background-color: #e74c3c;"
+           onclick="return confirm('Are you sure you want to log out?');">Logout</a>
+
+    </nav>
+</header>
+
+<!-- Confirmation Script -->
+<script>
+    function confirmLogout(e) {
+        e.preventDefault();  // Prevent the link's default action
+        if (confirm("Are you sure you want to log out?")) {
+            window.location.href = "/logout";  // Redirect only if confirmed
+        }
+    }
+</script>
