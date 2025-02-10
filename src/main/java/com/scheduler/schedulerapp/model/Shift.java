@@ -55,5 +55,4 @@ public class Shift {
     public LocalTime getEndTime() {
         return endTime;
     }
-
 }

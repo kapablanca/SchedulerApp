@@ -13,8 +13,6 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Long> {
     List<Schedule> findByDate(LocalDate date);
     List<Schedule> findByPersonIdAndDate(Long personId, LocalDate date);
     boolean existsByPersonIdAndDate(Long personId, LocalDate date);
-
-    // New method for fetching schedules within a date range
     List<Schedule> findByDateBetween(LocalDate startDate, LocalDate endDate);
 }
 

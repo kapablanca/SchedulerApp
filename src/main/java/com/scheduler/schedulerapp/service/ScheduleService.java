@@ -26,8 +26,6 @@ public class ScheduleService {
         this.shiftService = shiftService;
     }
 
-
-
     public List<Schedule> getAllSchedules() {
         return scheduleRepository.findAll();
     }
@@ -39,13 +37,8 @@ public class ScheduleService {
     public List<Schedule> getSchedulesByDate(LocalDate date) {
         return scheduleRepository.findByDate(date);
     }
-
-    public List<Schedule> getSchedulesByDateRange(LocalDate startDate, LocalDate endDate) {
-        return scheduleRepository.findByDateBetween(startDate, endDate);
-    }
-
+    
     public Schedule saveSchedule(Schedule schedule) {
-        // Ensure no duplicate schedules are added for the same person and day
         if (scheduleRepository.existsByPersonIdAndDate(schedule.getPerson().getId(), schedule.getDate())) {
             throw new IllegalArgumentException("This person already has a schedule for the given date.");
         }
@@ -75,7 +68,6 @@ public class ScheduleService {
         LocalDate endOfMonth = monthStart.withDayOfMonth(monthStart.lengthOfMonth());
 
         int personIndex = 0;
-
         while (!currentDate.isAfter(endOfMonth)) {
             for (Shift shift : shifts) {
                 Person assignedPerson = people.get(personIndex % people.size());
@@ -83,44 +75,31 @@ public class ScheduleService {
                 schedule.setDate(currentDate);
                 schedule.setShift(shift);
                 schedule.setPerson(assignedPerson);
-
                 schedules.add(schedule);
                 personIndex++;
             }
             currentDate = currentDate.plusDays(1);
         }
-
         return scheduleRepository.saveAll(schedules);
     }
 
-
     public void updateAssignment(LocalDate date, Long shiftId, Long personId) {
-        // Retrieve schedules for the given date
         List<Schedule> schedules = scheduleRepository.findByDate(date);
-
-        // Find the schedule corresponding to the given shiftId
         Optional<Schedule> optionalSchedule = schedules.stream()
                 .filter(s -> s.getShift().getId().equals(shiftId))
                 .findFirst();
 
         if (personId == null || personId == 0) {
-            // If no person is selected, remove the assignment if it exists.
-            if (optionalSchedule.isPresent()) {
-                scheduleRepository.delete(optionalSchedule.get());
-            }
+            optionalSchedule.ifPresent(scheduleRepository::delete);
         } else {
-            // Otherwise, update or create the assignment.
-            // You will need a method in your PersonService to fetch the Person by id:
             Person person = personService.getPersonById(personId);
             if (optionalSchedule.isPresent()) {
                 Schedule schedule = optionalSchedule.get();
                 schedule.setPerson(person);
                 scheduleRepository.save(schedule);
             } else {
-                // Optionally, create a new schedule if one doesn't exist for that shift on that day.
                 Schedule schedule = new Schedule();
                 schedule.setDate(date);
-                // You will also need a method in your ShiftService to fetch the shift by id:
                 Shift shift = shiftService.getShiftById(shiftId);
                 schedule.setShift(shift);
                 schedule.setPerson(person);
@@ -128,6 +107,4 @@ public class ScheduleService {
             }
         }
     }
-
 }
-

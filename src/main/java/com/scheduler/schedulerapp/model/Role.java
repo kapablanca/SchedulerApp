@@ -1,8 +1,6 @@
 package com.scheduler.schedulerapp.model;
 
 import jakarta.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "roles")
@@ -21,7 +19,7 @@ public class Role {
         this.name = name;
     }
 
-    // Getters (No setter for id)
+    // Getters
     public Long getId() {
         return id;
     }
