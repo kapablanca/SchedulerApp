@@ -26,6 +26,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Allow everyone to access the login, error pages, and static resources
                         .requestMatchers("/login", "/error", "/styles.css", "/webjars/**").permitAll()
+                        //Allow everyone to access the swagger endpoint
+                        .requestMatchers("/swagger-ui.html","/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         // Only ADMIN role can access any URL under /users
                         .requestMatchers("/users/**").hasRole("ADMIN")
                         // Both ADMIN and USER can access /people, /shifts, and /schedule
