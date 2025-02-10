@@ -1,12 +1,22 @@
-/* Login page styles */
+/* ------------------------- */
+/* Global Resets & Base      */
+/* ------------------------- */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+}
+
+/* ------------------------- */
+/* Login Page Styles         */
+/* (Only used when body has .login-page class) */
 body.login-page {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     background-color: #f2f2f2;
-    margin: 0;
-    padding: 0;
 }
 
 .login-container {
@@ -56,35 +66,24 @@ body.login-page {
     text-align: center;
 }
 
-/* Navigation button styles (for index and other pages) */
-.nav-button {
-    display: block;
-    width: 200px;
+/* ------------------------- */
+/* Homepage Styles           */
+/* ------------------------- */
+.home-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 15px;
     padding: 10px;
-    margin: 10px auto;
-    background-color: #0073e6;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    font-size: 18px;
-    border-radius: 5px;
+    box-sizing: border-box;
 }
 
-.nav-button:hover {
-    background-color: #005bb5;
-}
-
-/* Optionally, override the logout button style if desired */
-.nav-button.logout {
-    background-color: #e74c3c;
-}
-
-.nav-button.logout:hover {
-    background-color: #c0392b;
-}
-
-/*Simple button styles*/
-.button {
+/* ------------------------- */
+/* Navigation & Button Styles */
+/* ------------------------- */
+.nav-button, .button {
     display: inline-block;
     padding: 10px 20px;
     font-size: 16px;
@@ -97,15 +96,58 @@ body.login-page {
     text-decoration: none;
 }
 
-.button:hover {
+.nav-button {
+    width: 250px;
+    margin: 5px auto;
+    font-size: 18px;
+    text-align: center;
+}
+
+.nav-button:hover, .button:hover {
     background-color: #005bb5;
 }
 
-/*Simple table styles*/
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Logout button override */
+.nav-button.logout, .nav-link.logout {
+    background-color: #e74c3c;
+}
+
+.nav-button.logout:hover, .nav-link.logout:hover {
+    background-color: #c0392b;
+}
+
+.small-button {
+    background-color: #0073e6;
+    color: white;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-flex;
+    margin-top: 0;
+    align-self: flex-start;
+}
+
+.small-button:hover {
+    background-color: #005bb5;
+}
+
+
+/* ------------------------- */
+/* Table Styles              */
+/* ------------------------- */
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    margin-bottom: 0;
 }
 
 th, td {
@@ -127,16 +169,9 @@ tr:hover {
     background-color: #d1e7ff;
 }
 
-
-/* Overall page layout */
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: Arial, sans-serif;
-}
-
-/* Header styles */
+/* ------------------------- */
+/* Header Styles             */
+/* ------------------------- */
 .site-header {
     background-color: #0073e6;
     color: white;
@@ -146,7 +181,7 @@ body, html {
     align-items: center;
     width: 100%;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
-    flex-wrap: wrap;  /* Allow wrapping on smaller screens */
+    flex-wrap: wrap;
     box-sizing: border-box;
 }
 
@@ -157,8 +192,8 @@ body, html {
 
 .site-header nav {
     display: flex;
-    gap: 10px;  /* Space between links */
-    flex-wrap: wrap;  /* Allow wrapping */
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .nav-link {
@@ -174,45 +209,45 @@ body, html {
     background-color: #005bb5;
 }
 
-.nav-link.logout {
-    background-color: #e74c3c;
-}
-
-.nav-link.logout:hover {
-    background-color: #c0392b;
-}
-
-/* Media query for smaller screens */
-@media (max-width: 768px) {
-    .site-header {
-        flex-direction: column;  /* Stack the title and nav links */
-        align-items: flex-start;
-    }
-
-    .site-header nav {
-        width: 100%;  /* Ensure links don’t overflow horizontally */
-        justify-content: flex-start;
-    }
-
-    .nav-link {
-        padding: 8px 10px;
-        font-size: 14px;  /* Reduce font size on smaller screens */
-    }
-}
-
-
-/* Footer styles */
+/* ------------------------- */
+/* Footer Styles             */
+/* ------------------------- */
 .site-footer {
     background-color: #0073e6;
     color: white;
     padding: 10px 20px;
+    text-align: center;
     position: relative;
     bottom: 0;
     width: 100%;
-    text-align: center;
 }
 
 .site-footer p {
     margin: 0;
 }
 
+/* ------------------------- */
+/* Responsive Design         */
+/* ------------------------- */
+@media (max-width: 768px) {
+    .site-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .site-header nav {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .nav-link, .nav-button {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}

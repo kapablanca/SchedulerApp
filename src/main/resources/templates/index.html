@@ -6,26 +6,31 @@
     <title>Scheduler App</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
 </head>
+
+
 <body>
 <h1>Welcome to the Scheduler App</h1>
 
-<!-- Links for Admins -->
-<div sec:authorize="hasRole('ADMIN')">
-    <a th:href="@{/people}" class="nav-button">Manage People</a>
-    <a th:href="@{/shifts}" class="nav-button">Manage Shifts</a>
-    <a th:href="@{/users}" class="nav-button">Manage Users</a>
-    <a th:href="@{/schedule}" class="nav-button">Manage Schedule</a>
-</div>
+<div class="home-container">
+    <!-- Links for Admins -->
+    <div sec:authorize="hasRole('ADMIN')" class="button-group">
+        <a th:href="@{/people}" class="nav-button">Manage People</a>
+        <a th:href="@{/shifts}" class="nav-button">Manage Shifts</a>
+        <a th:href="@{/users}" class="nav-button">Manage Users</a>
+        <a th:href="@{/schedule}" class="nav-button">Manage Schedule</a>
+    </div>
 
-<!-- Links for Users -->
-<div sec:authorize="hasRole('USER')">
-    <a th:href="@{/people}" class="nav-button">View People</a>
-    <a th:href="@{/shifts}" class="nav-button">View Shifts</a>
-    <a th:href="@{/schedule}" class="nav-button">View Schedule</a>
-</div>
+    <!-- Links for Users -->
+    <div sec:authorize="hasRole('USER')" class="button-group">
+        <a th:href="@{/people}" class="nav-button">View People</a>
+        <a th:href="@{/shifts}" class="nav-button">View Shifts</a>
+        <a th:href="@{/schedule}" class="nav-button">View Schedule</a>
+    </div>
 
-<a th:href="@{/logout}" class="nav-button logout"
-   onclick="return confirm('Are you sure you want to log out?');">Logout</a>
+    <a th:href="@{/logout}" class="nav-button logout"
+       onclick="return confirm('Are you sure you want to log out?');">Logout</a>
+
+</div>
 
 <footer th:replace="fragments/footer :: footer"></footer>
 </body>

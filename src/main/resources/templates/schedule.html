@@ -5,88 +5,85 @@
     <meta charset="UTF-8">
     <title>Schedule - Scheduler App</title>
     <link rel="stylesheet" th:href="@{/styles.css}">
-    <!-- Include home.css if you use additional page-specific styling (for tabs etc) -->
-    <link rel="stylesheet" th:href="@{/home.css}">
+
 </head>
 <body>
-<!-- Header fragment (if you have one) -->
+<!-- Header fragment  -->
 <header th:replace="fragments/header :: header"></header>
 
-<main>
-    <!-- Navigation for Year/Month -->
-    <div class="schedule-nav" style="text-align: center; margin: 20px 0;">
-        <!-- Previous month link -->
-        <a th:href="@{/schedule(year=${previousYear}, month=${previousMonth})}" class="nav-button" style="width: auto; display: inline-block; padding: 5px 10px;">&lt; Prev</a>
+<div class="wrapper">
 
-        <!-- Display current month and year -->
-        <span style="font-size: 20px; margin: 0 15px;">
-                <span th:text="${monthName}"></span> <span th:text="${currentYear}"></span>
-            </span>
+    <main>
+        <!-- Navigation for Year/Month -->
+        <div class="schedule-nav" style="text-align: center; margin: 20px 0;">
+            <!-- Previous month link -->
+            <a th:href="@{/schedule(year=${previousYear}, month=${previousMonth})}" class="nav-button" style="width: auto; display: inline-block; padding: 5px 10px;">&lt; Prev</a>
 
-        <!-- Next month link -->
-        <a th:href="@{/schedule(year=${nextYear}, month=${nextMonth})}" class="nav-button" style="width: auto; display: inline-block; padding: 5px 10px;">Next &gt;</a>
-    </div>
+            <!-- Display current month and year -->
+            <span style="font-size: 20px; margin: 0 15px;">
+                    <span th:text="${monthName}"></span> <span th:text="${currentYear}"></span>
+                </span>
 
-    <!-- Calendar Table -->
-    <table style="margin: auto; width: 90%; border-collapse: collapse;">
-        <thead>
-        <tr>
-            <!-- First column for Day number and weekday -->
-            <th style="width: 100px; text-align: center;">Day</th>
-            <!-- One column for each shift -->
-            <th th:each="shift : ${shiftList}" style="text-align: center; border: 1px solid #ccc;">
-                <div th:text="${shift.name}"></div>
-                <div style="font-size: 0.9em; color: #555;"
-                     th:text="'(' + ${shift.startTime} + ' - ' + ${shift.endTime} + ')'"></div>
-            </th>
-        </tr>
-        </thead>
-        <tbody>
-        <!-- For each day in the month -->
-        <tr th:each="day : ${days}">
-            <!-- First cell: day number and first three letters of the weekday -->
-            <td style="text-align: center; border: 1px solid #ccc; padding: 5px;">
-                <div th:text="${day.dayNumber}"></div>
-                <div style="font-size: 0.85em; color: #777;" th:text="${day.dayName}"></div>
-            </td>
-            <!-- One cell per shift -->
-            <td th:each="shift : ${shiftList}" style="text-align: center; border: 1px solid #ccc; padding: 5px;">
-                <!-- Display the assigned person's initials (or name) if exists, or a dash if none -->
-                <div th:if="${day.assignments[shift.id] != null}"
-                     th:text="${day.assignments[shift.id].firstName} + ' ' + ${day.assignments[shift.id].lastName}">Assigned</div>
-                <div th:if="${day.assignments[shift.id] == null}">-</div>
+            <!-- Next month link -->
+            <a th:href="@{/schedule(year=${nextYear}, month=${nextMonth})}" class="nav-button" style="width: auto; display: inline-block; padding: 5px 10px;">Next &gt;</a>
+        </div>
 
-                <!-- Admin controls: a dropdown to select or clear a person assignment -->
-                <div sec:authorize="hasRole('ADMIN')" style="margin-top: 5px;">
-                    <form th:action="@{/schedule/update}" method="post">
-                        <!-- Send the date and shift id as hidden fields -->
-                        <input type="hidden" name="date" th:value="${day.date}" />
-                        <input type="hidden" name="shiftId" th:value="${shift.id}" />
-                        <!-- Dropdown list: pre-select the person if assigned; otherwise show a placeholder -->
-                        <select name="personId">
-                            <!-- Always include the "None" option -->
-                            <option value="0" th:selected="${day.assignments[shift.id] == null}">-- None --</option>
-                            <option th:each="person : ${peopleList}"
-                                    th:value="${person.id}"
-                                    th:text="${person.firstName} + ' ' + ${person.lastName}"
-                                    th:selected="${day.assignments[shift.id] != null and day.assignments[shift.id].id == person.id}">
-                            </option>
-                        </select>
-                        <button type="submit">Update</button>
-                    </form>
-                </div>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</main>
+        <!-- Calendar Table -->
+        <table style="margin: auto; width: 90%; border-collapse: collapse;">
+            <thead>
+            <tr>
+                <!-- First column for Day number and weekday -->
+                <th style="width: 100px; text-align: center;">Day</th>
+                <!-- One column for each shift -->
+                <th th:each="shift : ${shiftList}" style="text-align: center; border: 1px solid #ccc;">
+                    <div th:text="${shift.name}"></div>
+                    <div style="font-size: 0.9em; color: #555;"
+                         th:text="'(' + ${shift.startTime} + ' - ' + ${shift.endTime} + ')'"></div>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- For each day in the month -->
+            <tr th:each="day : ${days}">
+                <!-- First cell: day number and first three letters of the weekday -->
+                <td style="text-align: center; border: 1px solid #ccc; padding: 5px;">
+                    <div th:text="${day.dayNumber}"></div>
+                    <div style="font-size: 0.85em; color: #777;" th:text="${day.dayName}"></div>
+                </td>
+                <!-- One cell per shift -->
+                <td th:each="shift : ${shiftList}" style="text-align: center; border: 1px solid #ccc; padding: 5px;">
+                    <!-- Display the assigned person's  name if exists, or a dash if none -->
+                    <div th:if="${day.assignments[shift.id] != null}"
+                         th:text="${day.assignments[shift.id].firstName} + ' ' + ${day.assignments[shift.id].lastName}">Assigned</div>
+                    <div th:if="${day.assignments[shift.id] == null}">-</div>
 
-<!-- Footer fragment (if you have one) -->
+                    <!-- Admin controls: a dropdown to select or clear a person assignment -->
+                    <div sec:authorize="hasRole('ADMIN')" style="margin-top: 5px;">
+                        <form th:action="@{/schedule/update}" method="post">
+                            <!-- Send the date and shift id as hidden fields -->
+                            <input type="hidden" name="date" th:value="${day.date}" />
+                            <input type="hidden" name="shiftId" th:value="${shift.id}" />
+                            <!-- Dropdown list: pre-select the person if assigned; otherwise show a placeholder -->
+                            <select name="personId">
+                                <!-- Always include the "None" option -->
+                                <option value="0" th:selected="${day.assignments[shift.id] == null}">-- None --</option>
+                                <option th:each="person : ${peopleList}"
+                                        th:value="${person.id}"
+                                        th:text="${person.firstName} + ' ' + ${person.lastName}"
+                                        th:selected="${day.assignments[shift.id] != null and day.assignments[shift.id].id == person.id}">
+                                </option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </main>
+</div>
+<!-- Footer fragment  -->
 <footer th:replace="fragments/footer :: footer"></footer>
 
-<!-- Optional JavaScript if you want to support direct month/year input handling -->
-<script>
-    // For example, you could add listeners to input fields for direct editing.
-</script>
 </body>
 </html>

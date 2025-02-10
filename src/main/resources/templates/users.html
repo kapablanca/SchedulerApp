@@ -9,91 +9,90 @@
 
 <header th:replace="fragments/header :: header"></header>
 
-<h1>Manage Users</h1>
+<div class="wrapper">
+    <h1>Manage Users</h1>
 
-<!-- Table displaying users -->
-<table>
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>Roles</th>
-        <th>Actions</th>
-    </tr>
-    <tr th:each="user : ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.username}"></td>
-        <td>
-            <span th:each="role : ${user.roles}" th:text="${role.name}"></span>
-        </td>
-        <td>
-            <a href="#" th:attr="onclick='showForm(' + ${user.id} + '); return false;'">Edit</a> |
-            <a href="#" th:attr="onclick='confirmDelete(' + ${user.id} + '); return false;'">Delete</a>
-        </td>
-    </tr>
-</table>
+    <!-- Table displaying users -->
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Roles</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="user : ${users}">
+            <td th:text="${user.id}"></td>
+            <td th:text="${user.username}"></td>
+            <td>
+                <span th:each="role : ${user.roles}" th:text="${role.name}"></span>
+            </td>
+            <td>
+                <a href="#" th:attr="onclick='showForm(' + ${user.id} + '); return false;'">Edit</a> |
+                <a href="#" th:attr="onclick='confirmDelete(' + ${user.id} + '); return false;'">Delete</a>
+            </td>
+        </tr>
+    </table>
 
-<button onclick="showForm(null);">Add New User</button>
+    <button onclick="showForm(null);" class="small-button">Add New User</button>
 
-<!-- Add/Edit User Form -->
-<div id="form-section" style="display:none;">
-    <h2 id="form-title">Add New User</h2>
-    <form th:action="@{/users/save}" method="post" onsubmit="return confirmSave();">
-        <input type="hidden" id="userId" name="id" />
+    <!-- Add/Edit User Form -->
+    <div id="form-section" style="display:none;">
+        <h2 id="form-title">Add New User</h2>
+        <form th:action="@{/users/save}" method="post" onsubmit="return confirmSave();">
+            <input type="hidden" id="userId" name="id" />
 
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required />
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required />
 
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" placeholder="Leave empty to keep existing password" />
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" placeholder="Leave empty to keep existing password" />
 
-        <label for="role">Role:</label>
-        <select id="role" name="roleName">
-            <option th:each="role : ${roles}" th:value="${role.name}" th:text="${role.name}"
-                    th:if="${role.name == 'ROLE_USER'}" selected="selected"></option>
-            <option th:each="role : ${roles}" th:value="${role.name}" th:text="${role.name}"
-                    th:if="${role.name != 'ROLE_USER'}"></option>
-        </select>
+            <label for="role">Role:</label>
+            <select id="role" name="roleName">
+                <option th:each="role : ${roles}" th:value="${role.name}" th:text="${role.name}"
+                        th:if="${role.name == 'ROLE_USER'}" selected="selected"></option>
+                <option th:each="role : ${roles}" th:value="${role.name}" th:text="${role.name}"
+                        th:if="${role.name != 'ROLE_USER'}"></option>
+            </select>
 
-        <button type="submit" id="submit-button">Save User</button>
-    </form>
-</div>
+            <button type="submit" id="submit-button" class="small-button">Save User</button>
+        </form>
+    </div>
 
-<a th:href="@{/}">Back to Home</a>
+    <script>
+        // Show the form for adding or editing a user
+        function showForm(userId) {
+            const formSection = document.getElementById('form-section');
+            const formTitle = document.getElementById('form-title');
+            const submitButton = document.getElementById('submit-button');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+            const roleSelect = document.getElementById('role');
+            const userIdInput = document.getElementById('userId');
 
-<script>
-    // Show the form for adding or editing a user
-    function showForm(userId) {
-        const formSection = document.getElementById('form-section');
-        const formTitle = document.getElementById('form-title');
-        const submitButton = document.getElementById('submit-button');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        const roleSelect = document.getElementById('role');
-        const userIdInput = document.getElementById('userId');
+            if (userId) {
+                // Edit Mode: Fetch user details
+                fetch(`/api/v1/users/${userId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch user details');
+                        }
+                        return response.json();
+                    })
+                    .then(user => {
+                        // Populate the form with the fetched details
+                        formTitle.innerText = 'Edit User';
+                        submitButton.innerText = 'Update User';
+                        usernameInput.value = user.username;
+                        passwordInput.value = ''; // Leave password empty for security reasons
+                        userIdInput.value = user.id;
 
-        if (userId) {
-            // Edit Mode: Fetch user details
-            fetch(`/api/v1/users/${userId}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch user details');
-                    }
-                    return response.json();
-                })
-                .then(user => {
-                    // Populate the form with the fetched details
-                    formTitle.innerText = 'Edit User';
-                    submitButton.innerText = 'Update User';
-                    usernameInput.value = user.username;
-                    passwordInput.value = ''; // Leave password empty for security reasons
-                    userIdInput.value = user.id;
+                        // Set the correct role in the dropdown
+                        for (let option of roleSelect.options) {
+                            option.selected = user.roles.some(role => role.name === option.value);
+                        }
 
-                    // Set the correct role in the dropdown
-                    for (let option of roleSelect.options) {
-                        option.selected = user.roles.some(role => role.name === option.value);
-                    }
-
-                    formSection.style.display = 'block';
+                        formSection.style.display = 'block';
                 })
                 .catch(error => {
                     console.error('Error fetching user details:', error);
@@ -102,7 +101,7 @@
         } else {
             // Add Mode: Clear the form
             formTitle.innerText = 'Add New User';
-            submitButton.innerText = 'Add User';
+            submitButton.innerText = 'Save User';
             usernameInput.value = '';
             passwordInput.value = '';
             userIdInput.value = '';
@@ -124,6 +123,7 @@
         return confirm("Are you sure you want to save these changes?");
     }
 </script>
+</div>
 
 <footer th:replace="fragments/footer :: footer"></footer>
 </body>
